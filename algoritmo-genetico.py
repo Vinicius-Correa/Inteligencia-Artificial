@@ -8,8 +8,8 @@ valor_unidade = np.array([1, 3, 1, 8, 9, 3, 2, 8, 5, 1, 1, 6, 3, 2, 5, 2, 3, 8, 
 
 pm = 0.05 # probabilidade de mutacao 
 pc = 0.8 # probabilidade de crossover
-npop = 1000 # tamanho da populacao
-geracoes = 5000
+npop = 100 # tamanho da populacao
+geracoes = 500
 g = 0
 flag = True
 
