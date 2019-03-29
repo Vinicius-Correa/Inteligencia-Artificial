@@ -8,10 +8,9 @@ valor_unidade = np.array([1, 3, 1, 8, 9, 3, 2, 8, 5, 1, 1, 6, 3, 2, 5, 2, 3, 8, 
 
 pm = 0.05 # probabilidade de mutacao 
 pc = 0.8 # probabilidade de crossover
-npop = 8 # tamanho da populacao
-geracoes = 5
+npop = 100 # tamanho da populacao
+geracoes = 500
 g = 0
-
 flag = True
 
 peso_total = np.zeros(npop, dtype=int)
@@ -39,26 +38,20 @@ for j in range(npop):
 
 # seleciona o melhor pai
 pos_max = np.argmax(valor_total)
-best[0] = g
-best[1] = np.sum(pai, axis = 1)[pos_max]
-best[2] = peso_total[pos_max]
-best[3] = valor_total[pos_max]
+best[0] = g # geracao
+best[1] = np.sum(pai, axis = 1)[pos_max] # total de itens na mochila
+best[2] = peso_total[pos_max] # peso da mochila
+best[3] = valor_total[pos_max] # melhor maximo da mochila
 for i in range(4, len(best), 1):
     best[i] = pai[pos_max][i-4]
-#print(pos_max)
-#print(pai)
-#print(peso_total)
-#print(valor_total)
-#print("best: ")
-#print(best)
 
+# geracoes
 for g in range(1, geracoes, 1):
     # organiza os casais
     pai_selec = np.array([], dtype=int)
     selecao = random() * valor_total
     for i in range(npop):
         pos_max = np.argmax(selecao) # se a posicao maxima estiver repetida retorna zero (corrigir)
-        print(pos_max)
         for j in range(n_obj):
             new[j] = pai[pos_max][j]
         if i == 0:
@@ -66,14 +59,11 @@ for g in range(1, geracoes, 1):
         else:
             pai_selec = np.vstack((pai_selec, new))
         selecao = np.delete(selecao, pos_max)
-    #print(pai_selec)
-    #print("\n crossover \n")
 
     # crossover
     for j in range(0, npop -1, 2):
         if random() < pc:
             corte = round(random() * n_obj)
-            #print("crossover: " + str(corte))
             for i in range(n_obj):
                 if i <= corte:
                     filho[j][i] = pai_selec[j][i]
@@ -85,18 +75,15 @@ for g in range(1, geracoes, 1):
             for i in range(n_obj):
                 filho[j][i] = pai_selec[j][i]
                 filho[j+1][i] = pai_selec[j+1][i]
-    #print(filho)
 
     # mutacao
     for j in range(npop):
         for i in range(n_obj):
             if random() < pm:
-                #print("mutacao: " + str(i) + ", " + str(j))
                 if filho[j][i] == 1:
                     filho[j][i] = 0
                 else:
                     filho[j][i] = 1
-    print(filho)
 
     # penaliza os individuos infactiveis (criar algoritmo que repara)
     peso_total = np.zeros(npop, dtype=int)
@@ -108,14 +95,16 @@ for g in range(1, geracoes, 1):
         if peso_total[j] > C:
             valor_total[j] = 1
 
-    print ("peso = " + str(peso_total))
-    print ("valor = " + str(valor_total))
-
     # salvar a configuracao de maior valor encontrado e qual geracao pertence
-
+    pos_max = np.argmax(valor_total)
+    if valor_total[pos_max] > best[3]:
+        best[0] = g # geracao
+        best[1] = np.sum(pai, axis = 1)[pos_max] # total de itens na mochila
+        best[2] = peso_total[pos_max] # peso da mochila
+        best[3] = valor_total[pos_max] # melhor maximo da mochila
+        for i in range(4, len(best), 1):
+            best[i] = filho[pos_max][i-4]
 
     pai = filho
 
-
-#print("\n final \n")
-#print(pai)
+print(best)
