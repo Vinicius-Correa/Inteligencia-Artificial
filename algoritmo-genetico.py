@@ -6,16 +6,18 @@ n_obj = 42
 peso_unidade = np.array([3, 8, 12, 2, 8, 4, 4, 5, 1, 1, 8, 6, 4, 3, 3, 5, 7, 3, 5, 7, 4, 3, 7, 2, 3, 5, 4, 3, 7, 19, 20, 21, 11, 24, 13, 17, 18, 6, 15, 25, 12, 19])
 valor_unidade = np.array([1, 3, 1, 8, 9, 3, 2, 8, 5, 1, 1, 6, 3, 2, 5, 2, 3, 8, 9, 3, 2, 4, 5, 4, 3, 1, 3, 2, 14, 32, 20, 19, 15, 37, 18, 13, 19, 10, 15, 40, 17, 39])
 
-pm = 0.05 #probabilidade de mutacao 
-pc = 0.8 #probabilidade de crossover
+pm = 0.05 # probabilidade de mutacao 
+pc = 0.8 # probabilidade de crossover
 npop = 8 # tamanho da populacao
 geracoes = 5
+g = 0
 
 flag = True
 
 peso_total = np.zeros(npop, dtype=int)
 valor_total = np.zeros(npop, dtype=int)
 filho = np.zeros((npop,n_obj), dtype=int)
+best = np.zeros(n_obj + 4, dtype=int)
 
 pai = np.random.choice([0, 1], size=(npop, n_obj))
 
@@ -35,12 +37,27 @@ for j in range(npop):
         else:
             flag = False
 
-for g in range(geracoes):
-    pai_selec = np.array([], dtype=int)
+# seleciona o melhor pai
+pos_max = np.argmax(valor_total)
+best[0] = g
+best[1] = np.sum(pai, axis = 1)[pos_max]
+best[2] = peso_total[pos_max]
+best[3] = valor_total[pos_max]
+for i in range(4, len(best), 1):
+    best[i] = pai[pos_max][i-4]
+#print(pos_max)
+#print(pai)
+#print(peso_total)
+#print(valor_total)
+#print("best: ")
+#print(best)
+
+for g in range(1, geracoes, 1):
     # organiza os casais
+    pai_selec = np.array([], dtype=int)
     selecao = random() * valor_total
     for i in range(npop):
-        pos_max = np.argmax(selecao) # se a posicao maxima estiver repetida retorna zero
+        pos_max = np.argmax(selecao) # se a posicao maxima estiver repetida retorna zero (corrigir)
         print(pos_max)
         for j in range(n_obj):
             new[j] = pai[pos_max][j]
@@ -81,7 +98,7 @@ for g in range(geracoes):
                     filho[j][i] = 1
     print(filho)
 
-    # penaliza os individuos infactiveis
+    # penaliza os individuos infactiveis (criar algoritmo que repara)
     peso_total = np.zeros(npop, dtype=int)
     valor_total = np.zeros(npop, dtype=int)
     for j in range(npop):
@@ -95,12 +112,10 @@ for g in range(geracoes):
     print ("valor = " + str(valor_total))
 
     # salvar a configuracao de maior valor encontrado e qual geracao pertence
-    
+
 
     pai = filho
 
 
 #print("\n final \n")
 #print(pai)
-
-
